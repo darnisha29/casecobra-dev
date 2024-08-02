@@ -24,11 +24,11 @@ interface DesignConfiguratorProps {
     imageUrl: string
     imageDimensions: { width: number; height: number }
 }
-
-  
+import {useRouter} from 'next/navigation'
+import { SaveConfigArgs } from "./action"
 
 const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfiguratorProps) => {
-
+  const router = useRouter()
     
     const [options, setOptions] = useState<{
         color: (typeof COLORS)[number]
@@ -54,22 +54,22 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
       const phoneCaseRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // const { mutate: saveConfig, isPending } = useMutation({
-  //   mutationKey: ['save-config'],
-  //   mutationFn: async (args: SaveConfigArgs) => {
-  //     await Promise.all([saveConfiguration(), _saveConfig(args)])
-  //   },
-  //   onError: () => {
-  //     toast({
-  //       title: 'Something went wrong',
-  //       description: 'There was an error on our end. Please try again.',
-  //       variant: 'destructive',
-  //     })
-  //   },
-  //   onSuccess: () => {
-  //     router.push(`/configure/preview?id=${configId}`)
-  //   },
-  // })
+  const { mutate: saveConfig, isPending } = useMutation({
+    mutationKey: ['save-config'],
+    mutationFn: async (args: SaveConfigArgs) => {
+      await Promise.all([saveConfiguration(), saveConfig(args)])
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was an error on our end. Please try again.',
+        variant: 'destructive',
+      })
+    },
+    onSuccess: () => {
+      router.push(`/configure/preview?id=${configId}`)
+    },
+  })
 
   const { startUpload } = useUploadThing('imageUploader')
   async function saveConfiguration() {
@@ -135,6 +135,12 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
     return new Blob([byteArray], { type: mimeType })
   }
 
+
+  function getEnumValue<T extends Record<string, string>>(enumType: T, value: string): T[keyof T] | undefined {
+    return Object.values(enumType).includes(value as any) ? value as any : undefined;
+  }
+  
+  
     // const [options, setOptions] = useState({
     //     color: COLORS[0],
     //   });
@@ -370,14 +376,14 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
                 // disabled={isPending}
                 loadingText="Saving"
                 onClick={() =>
-                  // saveConfig({
-                  //   configId,
-                  //   color: options.color.value,
-                  //   finish: options.finish.value,
-                  //   material: options.material.value,
-                  //   model: options.model.value,
-                  // })
-                  saveConfiguration()
+                  saveConfig({
+                    configId,
+                    finish: options.finish.value,
+                    color: options.color.value,
+                    material: options.material.value,
+                    model: options.model.value,
+                  })
+                  // saveConfiguration()
                 }
                 size='sm'
                 className='w-full'>

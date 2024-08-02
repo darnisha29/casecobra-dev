@@ -1,12 +1,12 @@
 import { PRODUCT_PRICES } from "@/config/products";
 
-export interface ColorOption {
-    label: string;
-    value: string;
-    tw: string;
-  }
+// export interface ColorOption {
+//     label: string;
+//     value: string;
+//     tw: string;
+//   }
 
-export const COLORS:ColorOption[] = [
+export const COLORS = [
   { label: 'Black', value: 'black', tw: 'bg-zinc-900' },
   {
     label: 'Blue',
