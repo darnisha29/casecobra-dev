@@ -8,10 +8,10 @@ const f = createUploadthing()
 export const ourFileRouter = {
   imageUploader: f({ image: { maxFileSize: '4MB' } })
     .input(z.object({ configId: z.string().optional() }))
-    .middleware(async ({ input }) => {
+    .middleware(async ({ input }:any) => {
       return { input }
     })
-    .onUploadComplete(async ({ metadata, file }) => {
+    .onUploadComplete(async ({ metadata, file }:any) => {
       const { configId } = metadata.input
 
       const res = await fetch(file.url);

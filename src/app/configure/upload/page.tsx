@@ -6,7 +6,7 @@ import { useUploadThing } from '@/lib/uploadthing'
 import { cn } from '@/lib/utils'
 import { Image, Loader2, MousePointerSquareDashed } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { SetStateAction, useState, useTransition } from 'react'
 import Dropzone, { FileRejection } from 'react-dropzone'
 
 const Page = () => {
@@ -16,13 +16,13 @@ const Page = () => {
   const router = useRouter()
 
   const { startUpload, isUploading } = useUploadThing('imageUploader', {
-    onClientUploadComplete: ([data]) => {
+    onClientUploadComplete: ([data]: any) => {
       const configId = data.serverData.configId
       startTransition(() => {
         router.push(`/configure/design?id=${configId}`)
       })
     },
-    onUploadProgress(p) {
+    onUploadProgress(p: SetStateAction<number>) {
       setUploadProgress(p)
     },
   })

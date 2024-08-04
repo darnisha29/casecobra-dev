@@ -6,14 +6,27 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+// export const formatPrice = (price: number) => {
+//   const formatter = new Intl.NumberFormat('en-US', {
+//     style: 'currency',
+//     currency: 'USD',
+//   })
+
+//   return formatter.format(price)
+// }
 export const formatPrice = (price: number) => {
+  if (isNaN(price)) {
+    console.error('Invalid price:', price);
+    return '$14.00'; // Fallback to a default value if the price is invalid
+  }
+
   const formatter = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
-  })
+  });
 
-  return formatter.format(price)
-}
+  return formatter.format(price);
+};
 
 export function constructMetadata({
   title = 'CaseCobra - custom high-quality phone cases',
