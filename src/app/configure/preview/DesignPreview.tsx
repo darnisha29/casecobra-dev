@@ -12,8 +12,9 @@ import { useEffect, useState } from 'react'
 import Confetti from 'react-dom-confetti'
 // import { createCheckoutSession } from './actions'
 import { useRouter } from 'next/navigation'
-import { useToast } from '@/components/ui/use-toast'
+import { toast, useToast } from '@/components/ui/use-toast'
 import { useKindeBrowserClient } from '@kinde-oss/kinde-auth-nextjs'
+import { createCheckoutSession } from './action'
 // import LoginModal from '@/components/LoginModal'
 
 const DesignPreview = ({configuration} : {configuration : Configuration}) => {
@@ -21,6 +22,10 @@ const DesignPreview = ({configuration} : {configuration : Configuration}) => {
     useEffect(() => (setShowConfetti(true)))
 
     const router = useRouter()
+    const { user } = useKindeBrowserClient()
+    const { id } = configuration
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false)
+
     const { color, model, finish, material } = configuration
 
   const tw = COLORS.find((supportedColor) => supportedColor.value === color)?.tw
@@ -35,30 +40,30 @@ const modelLabel = option && option.label
   if (finish === 'textured') totalPrice += PRODUCT_PRICES.finish.textured
   
   const { mutate: createPaymentSession } = useMutation({
-    // mutationKey: ['get-checkout-session'],
-    // mutationFn: createCheckoutSession,
-    // onSuccess: ({ url }) => {
-    //   if (url) router.push(url)
-    //   else throw new Error('Unable to retrieve payment URL.')
-    // },
-    // onError: () => {
-    //   toast({
-    //     title: 'Something went wrong',
-    //     description: 'There was an error on our end. Please try again.',
-    //     variant: 'destructive',
-    //   })
-    // },
+    mutationKey: ['get-checkout-session'],
+    mutationFn: createCheckoutSession,
+    onSuccess: ({ url }) => {
+      if (url) router.push(url)
+      else throw new Error('Unable to retrieve payment URL.')
+    },
+    onError: () => {
+      toast({
+        title: 'Something went wrong',
+        description: 'There was an error on our end. Please try again.',
+        variant: 'destructive',
+      })
+    },
   })
   
   const handleCheckout = () => {
-    // if (user) {
-    //   // create payment session
-    //   createPaymentSession({ configId: id })
-    // } else {
-    //   // need to log in
-    //   localStorage.setItem('configurationId', id)
-    //   setIsLoginModalOpen(true)
-    // }
+    if (user) {
+      // create payment session
+      createPaymentSession({ configId: id })
+    } else {
+      // need to log in
+      localStorage.setItem('configurationId', id)
+      setIsLoginModalOpen(true)
+    }
   }
   
   return (
