@@ -57,7 +57,12 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
   const { mutate: saveConfig, isPending } = useMutation({
     mutationKey: ['save-config'],
     mutationFn: async (args: SaveConfigArgs) => {
-      await Promise.all([saveConfiguration(), saveConfig(args)])
+
+
+      // await Promise.all([saveConfiguration(), saveConfig(args)])
+      await saveConfiguration();
+  await saveConfig(args);
+     
     },
     onError: () => {
       toast({
@@ -73,6 +78,7 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
 
   const { startUpload } = useUploadThing('imageUploader')
   async function saveConfiguration() {
+    
     try {
       const {
         left: caseLeft,
@@ -94,12 +100,10 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
       canvas.width = width
       canvas.height = height
       const ctx = canvas.getContext('2d')
-
       const userImage = new Image()
       userImage.crossOrigin = 'anonymous'
       userImage.src = imageUrl
       await new Promise((resolve) => (userImage.onload = resolve))
-
       ctx?.drawImage(
         userImage,
         actualX,
@@ -123,6 +127,7 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
         variant: 'destructive',
       })
     }
+
   }
 
   function base64ToBlob(base64: string, mimeType: string) {
@@ -262,7 +267,7 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
 
     <div className='relative flex flex-col gap-3 w-full'>
         <Label>Modal</Label>
-        <DropdownMenu>
+        {/* <DropdownMenu>
             <DropdownMenuTrigger>
                 <div>
             <Button
@@ -300,7 +305,46 @@ const DesignConfigurator = ({ configId, imageUrl, imageDimensions }: DesignConfi
                         </DropdownMenuItem>
                       ))}
                     </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
+        <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+        <div>
+            <Button
+                variant='outline'
+                role='combobox'
+                className='w-full justify-between'>
+                {options.model.label}
+                <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
+            </Button>
+        </div>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+        {MODELS.options.map((model) => (
+            <DropdownMenuItem
+                key={model.label}
+                className={cn(
+                    'flex text-sm gap-1 items-center p-1.5 cursor-default hover:bg-zinc-100',
+                    {
+                        'bg-zinc-100': model.label === options.model.label,
+                    }
+                )}
+                onClick={() => {
+                    setOptions((prev) => ({ ...prev, model }))
+                }}>
+                <Check
+                    className={cn(
+                        'mr-2 h-4 w-4',
+                        model.label === options.model.label
+                            ? 'opacity-100'
+                            : 'opacity-0'
+                    )}
+                />
+                {model.label}
+            </DropdownMenuItem>
+        ))}
+    </DropdownMenuContent>
+</DropdownMenu>
+
     </div>
     {[MATERIALS, FINISHES].map(({ name, options: selectableOptions }) => (
   <RadioGroup
